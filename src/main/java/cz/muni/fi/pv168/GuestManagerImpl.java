@@ -5,13 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 
-import java.io.IOException;
+
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
+
 
 import java.util.List;
-import org.apache.commons.dbcp2.BasicDataSource;
+
 
 
 public class GuestManagerImpl implements GuestManager {
@@ -26,7 +26,7 @@ public class GuestManagerImpl implements GuestManager {
     
      
     //@Override
-	public void createGuest(Guest guest) throws ServiceFailureException {
+	public void createGuest(Guest guest) throws DatabaseException {
 
         if (guest == null) {
             throw new IllegalArgumentException("guest is null");
@@ -43,8 +43,8 @@ public class GuestManagerImpl implements GuestManager {
             throw new IllegalArgumentException("guest adress is already set");
         }
                 
-        if (guest.getPhone() != 0) {
-            throw new IllegalArgumentException("guest phone is already set");
+        if (guest.getPhone() <= 0) {
+            throw new IllegalArgumentException("guest phone is a negative number");
         }
         
         if (guest.getBirthDate() != null) {
@@ -61,46 +61,40 @@ public class GuestManagerImpl implements GuestManager {
                 //  st.setDate(4, guest.getBirthDate());
                   int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
-                    throw new ServiceFailureException("Internal Error: More rows inserted when trying to insert guest " + guest);
+                    throw new DatabaseException("Wrong number of insert guests " + guest);
                 }
                 ResultSet keyRS = st.getGeneratedKeys();
                 guest.setId(getKey(keyRS, guest));
             }
         } catch (SQLException ex) {
             log.error("db connection problem", ex);
-            throw new ServiceFailureException("Error when retrieving all graves", ex);
+            throw new DatabaseException("Error when retrieving all guests", ex);
         }
     }
  
 	
-	 private Long getKey(ResultSet keyRS, Guest guest) throws ServiceFailureException, SQLException {
+	 private Long getKey(ResultSet keyRS, Guest guest) throws DatabaseException, SQLException {
 	        if (keyRS.next()) {
 	            if (keyRS.getMetaData().getColumnCount() != 1) {
-	                throw new ServiceFailureException("Internal Error: Generated key"
-	                        + "retriving failed when trying to insert guest " + guest
-	                        + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
+	                throw new DatabaseException("Failed: wrong number of key fields");
 	            }
 	            Long result = keyRS.getLong(1);
 	            if (keyRS.next()) {
-	                throw new ServiceFailureException("Internal Error: Generated key"
-	                        + "retriving failed when trying to insert guest " + guest
-	                        + " - more keys found");
+	                throw new DatabaseException("Failed: more keys retrieved than expected");
 	            }
 	            return result;
 	        } else {
-	            throw new ServiceFailureException("Internal Error: Generated key"
-	                    + "retriving failed when trying to insert guest " + guest
-	                    + " - no key found");
+	            throw new DatabaseException("Failed: no key found");
 	        }
 	    }
 
-	public void updateGuest(Guest guest)  throws ServiceFailureException {
+	public void updateGuest(Guest guest)  throws DatabaseException {
 		// TODO Auto-generated method stub
 	    if(guest==null) throw new IllegalArgumentException("guest pointer is null");
-        if(guest.getId() == 0) throw new IllegalArgumentException("guest with null id cannot be updated");
-        if(guest.getName()==null) throw new IllegalArgumentException("guest with null name cannot be updated");
-        if(guest.getAdress()==null) throw new IllegalArgumentException("guest with null adress cannot be updated");
-        if(guest.getPhone()==0) throw new IllegalArgumentException("guest phone is not positive number");
+        if(guest.getId() == 0) throw new IllegalArgumentException("guest with null ID cannot be updated");
+        if(guest.getName()==null) throw new IllegalArgumentException("guest with null NAME cannot be updated");
+        if(guest.getAdress()==null) throw new IllegalArgumentException("guest with null ADRESS cannot be updated");
+        if(guest.getPhone()<=0) throw new IllegalArgumentException("guest PHONE is not positive number");
 
         try (Connection conn = dataSource.getConnection()) {
             try(PreparedStatement st = conn.prepareStatement("UPDATE guest SET name=?,adress=?,phone=?,bithDate=? WHERE id=?")) {
@@ -111,32 +105,32 @@ public class GuestManagerImpl implements GuestManager {
               //  st.setDate(4,guest.getBirthDate());
                 
                 if(st.executeUpdate()!=1) {
-                    throw new IllegalArgumentException("cannot update guest "+guest);
+                    throw new IllegalArgumentException("Failed to execute query - updateGuest - "+guest);
                 }
             }
         } catch (SQLException ex) {
             log.error("db connection problem", ex);
-            throw new ServiceFailureException("Error when retrieving all guests", ex);
+            throw new DatabaseException("Failed to update guest -", ex);
         }
 
 	}
 
-		   public void deleteGuest(Guest guest) throws ServiceFailureException {
+		   public void deleteGuest(Guest guest) throws DatabaseException {
 		        try (Connection conn = dataSource.getConnection()) {
 		            try(PreparedStatement st = conn.prepareStatement("DELETE FROM guest WHERE id=?")) {
 		                st.setLong(1,guest.getId());
 		                if(st.executeUpdate()!=1) {
-		                    throw new ServiceFailureException("did not delete guest with id ="+guest.getId());
+		                    throw new DatabaseException("Failed to delete guest with ID = "+guest.getId());
 		                }
 		            }
 		        } catch (SQLException ex) {
 		            log.error("db connection problem", ex);
-		            throw new ServiceFailureException("Error when retrieving all guests", ex);
+		            throw new DatabaseException("Failed to execute query - deleteGuest", ex);
 		        }
 		   }
 	
 
-	public Guest getGuestById(long id) throws ServiceFailureException {
+	public Guest getGuestById(long id) throws DatabaseException {
 		   try (Connection conn = dataSource.getConnection()) {
 	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,adress,phone,birthDate FROM guest WHERE id = ?")) {
 	                st.setLong(1, id);
@@ -144,9 +138,7 @@ public class GuestManagerImpl implements GuestManager {
 	                if (rs.next()) {
 	                    Guest guest = resultSetToGuest(rs);
 	                    if (rs.next()) {
-	                        throw new ServiceFailureException(
-	                                "Internal error: More entities with the same id found "
-	                                        + "(source id: " + id + ", found " + guest + " and " + resultSetToGuest(rs));
+	                        throw new DatabaseException(" Failed: More entities with the same id found");
 	                    }
 	                    return guest;
 	                } else {
@@ -155,7 +147,7 @@ public class GuestManagerImpl implements GuestManager {
 	            }
 	        } catch (SQLException ex) {
 	            log.error("db connection problem", ex);
-	            throw new ServiceFailureException("Error when retrieving all graves", ex);
+	            throw new DatabaseException("Error when retrieving all graves", ex);
 	        }
 	}
 
@@ -183,7 +175,7 @@ public class GuestManagerImpl implements GuestManager {
 	            }
 	        } catch (SQLException ex) {
 	            log.error("db connection problem", ex);
-	            throw new ServiceFailureException("Error when retrieving all guests", ex);
+	            throw new DatabaseException("Error when retrieving all guests", ex);
 	        }
 	}
 
