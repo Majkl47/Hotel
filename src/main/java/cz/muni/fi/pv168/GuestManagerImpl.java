@@ -12,8 +12,6 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-
-
 public class GuestManagerImpl implements GuestManager {
 
 	final static Logger log = LoggerFactory.getLogger(GuestManagerImpl.class);
@@ -24,7 +22,7 @@ public class GuestManagerImpl implements GuestManager {
         this.dataSource = dataSource;
     }
     
-     
+   
     //@Override
 	public void createGuest(Guest guest) throws DatabaseException {
 
@@ -58,7 +56,8 @@ public class GuestManagerImpl implements GuestManager {
             	  st.setString(1,guest.getName());
                   st.setString(2,guest.getAdress());
                   st.setLong(3,guest.getPhone());
-                //  st.setDate(4, guest.getBirthDate());
+                  st.setDate(4, convertFromJAVADateToSQLDate(guest.getBirthDate()));
+                  
                   int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
                     throw new DatabaseException("Wrong number of insert guests " + guest);
@@ -101,8 +100,8 @@ public class GuestManagerImpl implements GuestManager {
               
                 st.setString(1,guest.getName());
                 st.setString(2,guest.getAdress());
-                st.setLong(3,guest.getPhone());
-              //  st.setDate(4,guest.getBirthDate());
+                st.setLong(3,guest.getPhone());               
+                st.setDate(4, convertFromJAVADateToSQLDate(guest.getBirthDate()));
                 
                 if(st.executeUpdate()!=1) {
                     throw new IllegalArgumentException("Failed to execute query - updateGuest - "+guest);
@@ -158,8 +157,8 @@ public class GuestManagerImpl implements GuestManager {
 		  guest.setName(rs.getString("name"));
 		  guest.setAdress(rs.getString("adress"));
 		  guest.setPhone(rs.getLong("phone"));
-		//  guest.setBirthDate(rs.getBirthDate("birthDate"));
-	      return guest;
+		  guest.setBirthDate(rs.getDate("birthDate"));
+		  return guest;
 	    }
 	  
 	public List<Guest> findAllGuests() {
@@ -178,5 +177,15 @@ public class GuestManagerImpl implements GuestManager {
 	            throw new DatabaseException("Error when retrieving all guests", ex);
 	        }
 	}
+	
+	  public static java.sql.Date convertFromJAVADateToSQLDate(
+	            java.util.Date javaDate) {
+	        java.sql.Date sqlDate = null;
+	        if (javaDate != null) {
+	            sqlDate = new Date(javaDate.getTime());
+	        }
+	        return sqlDate;
+	    }
+	
 
 }
