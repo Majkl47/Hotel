@@ -33,20 +33,16 @@ public class GuestManagerImpl implements GuestManager {
             throw new IllegalArgumentException("guest id is already set");
         }
         
-        if (guest.getName() != null) {
-            throw new IllegalArgumentException("guest name is already set");
+        if (guest.getName() == null) {
+            throw new IllegalArgumentException("guest name is not set");
         }
         
-        if (guest.getAdress() != null) {
-            throw new IllegalArgumentException("guest adress is already set");
-        }
-                
         if (guest.getPhone() <= 0) {
             throw new IllegalArgumentException("guest phone is a negative number");
         }
         
-        if (guest.getBirthDate() != null) {
-            throw new IllegalArgumentException("guest Birthday is already set");
+        if (guest.getBirthDate() == null) {
+            throw new IllegalArgumentException("guest Birthday is not set");
         }
 
         
@@ -146,7 +142,7 @@ public class GuestManagerImpl implements GuestManager {
 	            }
 	        } catch (SQLException ex) {
 	            log.error("db connection problem", ex);
-	            throw new DatabaseException("Error when retrieving all graves", ex);
+	            throw new DatabaseException("Error when retrieving all guests", ex);
 	        }
 	}
 
