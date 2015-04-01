@@ -47,13 +47,13 @@ public class GuestManagerImpl implements GuestManager {
 
         
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement st = conn.prepareStatement("INSERT INTO GUEST (name,adress,phone,birthDay) VALUES (?,?,?,?)",
+            try (PreparedStatement st = conn.prepareStatement("INSERT INTO GUEST (name,adress,phone,birthDate) VALUES (?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS)) {
-            	  st.setString(1,guest.getName());
-                  st.setString(2,guest.getAdress());
-                  st.setLong(3,guest.getPhone());
-                  st.setDate(4, convertFromJAVADateToSQLDate(guest.getBirthDate()));
-                  
+            	  st.setString(1, guest.getName());
+                  st.setString(2, guest.getAdress());
+                  st.setLong(3, guest.getPhone());
+                  st.setString(4, guest.getBirthDate());
+               
                   int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
                     throw new DatabaseException("Wrong number of insert guests " + guest);
@@ -90,14 +90,15 @@ public class GuestManagerImpl implements GuestManager {
         if(guest.getName()==null) throw new IllegalArgumentException("guest with null NAME cannot be updated");
         if(guest.getAdress()==null) throw new IllegalArgumentException("guest with null ADRESS cannot be updated");
         if(guest.getPhone()<=0) throw new IllegalArgumentException("guest PHONE is not positive number");
-
+        if(guest.getBirthDate()==null) throw new IllegalArgumentException("guest Birthday is not set");
+        
         try (Connection conn = dataSource.getConnection()) {
             try(PreparedStatement st = conn.prepareStatement("UPDATE guest SET name=?,adress=?,phone=?,bithDate=? WHERE id=?")) {
               
                 st.setString(1,guest.getName());
                 st.setString(2,guest.getAdress());
                 st.setLong(3,guest.getPhone());               
-                st.setDate(4, convertFromJAVADateToSQLDate(guest.getBirthDate()));
+                st.setString(4, guest.getBirthDate());
                 
                 if(st.executeUpdate()!=1) {
                     throw new IllegalArgumentException("Failed to execute query - updateGuest - "+guest);
@@ -153,7 +154,7 @@ public class GuestManagerImpl implements GuestManager {
 		  guest.setName(rs.getString("name"));
 		  guest.setAdress(rs.getString("adress"));
 		  guest.setPhone(rs.getLong("phone"));
-		  guest.setBirthDate(rs.getDate("birthDate"));
+		  guest.setBirthDate("birthDate");
 		  return guest;
 	    }
 	  

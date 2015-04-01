@@ -8,7 +8,7 @@ public class Guest {
 	private String name;
 	private String adress;
 	private long phone;
-	private Date birthDate;
+	private String birthDate;
 	
 	public long getId() {
 		return id;
@@ -42,12 +42,11 @@ public class Guest {
 		this.phone = phone;
 	}
 	
-	public Date getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 	
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
-
 }
