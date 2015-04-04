@@ -12,7 +12,7 @@ public interface RegistrationManager {
 
 	List<Registration> findAllRegistrations();
 
-	Registration getRegistrationById(long id);
+	Registration findRegistrationById(long id);
 
 	List<Registration> findRegistrationForGuest(Guest guest);
 

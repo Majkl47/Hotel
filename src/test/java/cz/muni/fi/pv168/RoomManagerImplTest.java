@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -29,21 +28,13 @@ public class RoomManagerImplTest {
         bds.setUrl("jdbc:derby:memory:RoomManagerTest;create=true");
         this.dataSource = bds;
 
-        try (Connection conn = bds.getConnection()) {
-            conn.prepareStatement("CREATE TABLE ROOM ("
-                    + "id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
-                    + "floor INT,"
-                    + "number INT,"
-                    + "capacity INT NOT NULL)").executeUpdate();
-        }
+        HotelUtils.executeSQLScript(dataSource, RoomManager.class.getResource("createDatabase.sql"));
 		roomManager = new RoomManagerImpl(dataSource);
 	}
 
 	@After
 	public void tearDown() throws SQLException {
-		try (Connection con = dataSource.getConnection()) {
-            con.prepareStatement("DROP TABLE ROOM").executeUpdate();
-        }
+		HotelUtils.executeSQLScript(dataSource, RoomManager.class.getResource("deleteDatabase.sql"));
 	}
 
 	@Test

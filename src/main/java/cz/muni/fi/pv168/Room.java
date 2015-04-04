@@ -39,4 +39,48 @@ public class Room {
 		this.capacity = capacity;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((capacity == null) ? 0 : capacity.hashCode());
+		result = prime * result + ((floor == null) ? 0 : floor.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((number == null) ? 0 : number.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Room other = (Room) obj;
+		if (capacity == null) {
+			if (other.capacity != null)
+				return false;
+		} else if (!capacity.equals(other.capacity))
+			return false;
+		if (floor == null) {
+			if (other.floor != null)
+				return false;
+		} else if (!floor.equals(other.floor))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (number == null) {
+			if (other.number != null)
+				return false;
+		} else if (!number.equals(other.number))
+			return false;
+		return true;
+	}
+
 }

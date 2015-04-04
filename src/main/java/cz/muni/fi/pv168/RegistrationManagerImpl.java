@@ -1,7 +1,6 @@
 package cz.muni.fi.pv168;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class RegistrationManagerImpl implements RegistrationManager {
 	
-	final static Logger log = LoggerFactory.getLogger(GuestManagerImpl.class);
+	final static Logger log = LoggerFactory.getLogger(RegistrationManagerImpl.class);
 	
     private final DataSource dataSource;
 
@@ -48,14 +47,14 @@ public class RegistrationManagerImpl implements RegistrationManager {
         }
         
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement st = conn.prepareStatement("INSERT INTO REGISTRATION (startDate,endDate,price,guest,room) VALUES (?,?,?,?,?)",
+            try (PreparedStatement st = conn.prepareStatement("INSERT INTO REGISTRATION (startDate,endDate,price,guestID,roomID) VALUES (?,?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS)) {
             	  
-                  st.setDate(1, convertFromJAVADateToSQLDate(registration.getStartDate()));
-                  st.setDate(2, convertFromJAVADateToSQLDate(registration.getEndDate()));
+                  st.setString(1, HotelUtils.convertDateToString(registration.getStartDate()));
+                  st.setString(2, HotelUtils.convertDateToString(registration.getEndDate()));
                   st.setDouble(3,registration.getPrice());
-                  st.setObject(4, registration.getGuest());
-                  st.setObject(5, registration.getRoom());
+                  st.setLong(4, registration.getGuest().getId());
+                  st.setLong(5, registration.getRoom().getId());
 
                   int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
@@ -98,16 +97,16 @@ public class RegistrationManagerImpl implements RegistrationManager {
         if(registration.getRoom() == null) throw new IllegalArgumentException("registration without room cannot be updated");
 
         try (Connection conn = dataSource.getConnection()) {
-            try(PreparedStatement st = conn.prepareStatement("UPDATE guest SET name=?,adress=?,phone=?,bithDate=? WHERE id=?")) {
+            try(PreparedStatement st = conn.prepareStatement("UPDATE registration SET startDate=?,endDate=?,price=?,guestID=?,roomID=? WHERE id=?")) {
               
-                st.setDate(1,convertFromJAVADateToSQLDate(registration.getStartDate()));
-                st.setDate(2,convertFromJAVADateToSQLDate(registration.getEndDate()));
-                st.setDouble(3,registration.getPrice());               
-                st.setObject(4, registration.getGuest());
-                st.setObject(4, registration.getRoom());
+                st.setString(1, HotelUtils.convertDateToString(registration.getStartDate()));
+                st.setString(2, HotelUtils.convertDateToString(registration.getEndDate()));
+                st.setDouble(3, registration.getPrice());               
+                st.setLong(4, registration.getGuest().getId());
+                st.setLong(4, registration.getRoom().getId());
                 
-                if(st.executeUpdate()!=1) {
-                    throw new IllegalArgumentException("Failed to execute query - updateGuest - "+registration);
+                if(st.executeUpdate() != 1) {
+                    throw new IllegalArgumentException("Failed to execute query - updateRegistration - " + registration);
                 }
             }
         } catch (SQLException ex) {
@@ -118,11 +117,12 @@ public class RegistrationManagerImpl implements RegistrationManager {
 	}
 
 	public void deleteRegistration(Registration registration) throws DatabaseException {
+		if(registration==null) throw new IllegalArgumentException("registration pointer is null");
 	    try (Connection conn = dataSource.getConnection()) {
             try(PreparedStatement st = conn.prepareStatement("DELETE from registration WHERE id=?")) {
-                st.setLong(1,registration.getId());
-                if(st.executeUpdate()!=1) {
-                    throw new DatabaseException("Failed to delete registration with ID = "+registration.getId());
+                st.setLong(1, registration.getId());
+                if(st.executeUpdate() != 1) {
+                    throw new DatabaseException("Failed to delete registration with ID = " + registration.getId());
                 }
             }
         } catch (SQLException ex) {
@@ -135,7 +135,7 @@ public class RegistrationManagerImpl implements RegistrationManager {
 	public List<Registration> findAllRegistrations() {
 		 log.debug("finding all registration");
 	        try (Connection conn = dataSource.getConnection()) {
-	            try (PreparedStatement st = conn.prepareStatement("SELECT id,startDate,endDate,price,guest,room FROM registration")) {
+	            try (PreparedStatement st = conn.prepareStatement("SELECT id,startDate,endDate,price,guestID,roomID FROM registration")) {
 	                ResultSet rs = st.executeQuery();
 	                List<Registration> result = new ArrayList<>();
 	                while (rs.next()) {
@@ -151,20 +151,23 @@ public class RegistrationManagerImpl implements RegistrationManager {
 
 
 	  private Registration resultSetToRegistration(ResultSet rs) throws SQLException {
+		  GuestManagerImpl guestManager = new GuestManagerImpl(dataSource);
+		  RoomManagerImpl roomManager = new RoomManagerImpl(dataSource);
+
 		  Registration registration = new Registration();
 		  registration.setId(rs.getLong("id"));
-		  registration.setStartDate(rs.getDate("startDate"));
-		  registration.setEndDate(rs.getDate("endDate"));
+		  registration.setStartDate(HotelUtils.convertStringToDate(rs.getString("startDate")));
+		  registration.setEndDate(HotelUtils.convertStringToDate(rs.getString("endDate")));
 		  registration.setPrice(rs.getDouble("price"));
-		 // registration.setGuest(rs.getObject("guest"));
-		 // registration.setRoom(rs.getObject("room"));
+		  registration.setGuest(guestManager.getGuestById(rs.getLong("guestID")));
+		  registration.setRoom(roomManager.findRoomById(rs.getLong("roomID")));
 
 		  return registration;
 	    }
 	  
-	public Registration getRegistrationById(long id) throws DatabaseException {
+	public Registration findRegistrationById(long id) throws DatabaseException {
 		   try (Connection conn = dataSource.getConnection()) {
-	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,adress,phone,birthDate FROM registration WHERE id = ?")) {
+	            try (PreparedStatement st = conn.prepareStatement("SELECT id,startDate,endDate,price,guestID,roomID FROM registration WHERE id = ?")) {
 	                st.setLong(1, id);
 	                ResultSet rs = st.executeQuery();
 	                if (rs.next()) {
@@ -178,28 +181,59 @@ public class RegistrationManagerImpl implements RegistrationManager {
 	                }
 	            }
 	        } catch (SQLException ex) {
-	            log.error("db connection problem", ex);
+	            log.error("DB connection problem", ex);
 	            throw new DatabaseException("Error when retrieving all guests", ex);
 	        }
 	}
 
-	public List<Registration> findRegistrationForGuest(Guest guest) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Registration> findRegistrationForGuest(Guest guest) throws DatabaseException {
+		if (guest == null) throw new NullPointerException("Input guest not initialized in \"findRegistrationForGuest()\"");
+
+		try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement st = conn.prepareStatement("SELECT id,startDate,endDate,price,guestID,roomID FROM registration WHERE guestID = ?")) {
+                st.setLong(1, guest.getId());
+                ResultSet rs = st.executeQuery();
+                List<Registration> result;
+                if(!rs.next()) {
+                	return null;
+                } else {
+                	result = new ArrayList<>();
+                	result.add(resultSetToRegistration(rs));
+                }
+                while (rs.next()) {
+                    result.add(resultSetToRegistration(rs));
+                }
+                return result;
+            }
+        } catch (SQLException ex) {
+            log.error("DB connection problem", ex);
+            throw new DatabaseException("Error when retrieving all guests", ex);
+        }
 	}
 
 	public List<Registration> findRegistrationForRoom(Room room) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	 public static java.sql.Date convertFromJAVADateToSQLDate(
-	            java.util.Date javaDate) {
-	        java.sql.Date sqlDate = null;
-	        if (javaDate != null) {
-	            sqlDate = new Date(javaDate.getTime());
-	        }
-	        return sqlDate;
-	    }
+		if (room == null) throw new NullPointerException("Input room not initialized in \"findRegistrationForRoom()\"");
 
+		try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement st = conn.prepareStatement("SELECT id,startDate,endDate,price,guestID,roomID FROM registration WHERE roomID = ?")) {
+                st.setLong(1, room.getId());
+                ResultSet rs = st.executeQuery();
+                List<Registration> result;
+                if (!rs.next())
+                {
+                	return null;
+                } else {
+                	result = new ArrayList<>();
+                	result.add(resultSetToRegistration(rs));
+                }
+                while (rs.next()) {
+                    result.add(resultSetToRegistration(rs));
+                }
+                return result;
+            }
+        } catch (SQLException ex) {
+            log.error("DB connection problem", ex);
+            throw new DatabaseException("Error when retrieving all guests", ex);
+        }
+	}
 }

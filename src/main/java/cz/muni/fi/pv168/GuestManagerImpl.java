@@ -1,16 +1,17 @@
 package cz.muni.fi.pv168;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
-
-import java.sql.*;
-import java.util.ArrayList;
-
-
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GuestManagerImpl implements GuestManager {
 
@@ -47,12 +48,12 @@ public class GuestManagerImpl implements GuestManager {
 
         
         try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement st = conn.prepareStatement("INSERT INTO GUEST (name,adress,phone,birthDate) VALUES (?,?,?,?)",
+            try (PreparedStatement st = conn.prepareStatement("INSERT INTO GUEST (name,address,phone,birthDate) VALUES (?,?,?,?)",
                     Statement.RETURN_GENERATED_KEYS)) {
             	  st.setString(1, guest.getName());
-                  st.setString(2, guest.getAdress());
+                  st.setString(2, guest.getAddress());
                   st.setLong(3, guest.getPhone());
-                  st.setString(4, guest.getBirthDate());
+                  st.setString(4, HotelUtils.convertDateToString(guest.getBirthDate()));
                
                   int addedRows = st.executeUpdate();
                 if (addedRows != 1) {
@@ -63,7 +64,7 @@ public class GuestManagerImpl implements GuestManager {
             }
         } catch (SQLException ex) {
             log.error("db connection problem", ex);
-            throw new DatabaseException("Error when retrieving all guests", ex);
+            throw new DatabaseException("Error inserting new guest", ex);
         }
     }
  
@@ -88,17 +89,17 @@ public class GuestManagerImpl implements GuestManager {
 	    if(guest==null) throw new IllegalArgumentException("guest pointer is null");
         if(guest.getId() == 0) throw new IllegalArgumentException("guest with null ID cannot be updated");
         if(guest.getName()==null) throw new IllegalArgumentException("guest with null NAME cannot be updated");
-        if(guest.getAdress()==null) throw new IllegalArgumentException("guest with null ADRESS cannot be updated");
+        if(guest.getAddress()==null) throw new IllegalArgumentException("guest with null ADDRESS cannot be updated");
         if(guest.getPhone()<=0) throw new IllegalArgumentException("guest PHONE is not positive number");
         if(guest.getBirthDate()==null) throw new IllegalArgumentException("guest Birthday is not set");
         
         try (Connection conn = dataSource.getConnection()) {
-            try(PreparedStatement st = conn.prepareStatement("UPDATE guest SET name=?,adress=?,phone=?,bithDate=? WHERE id=?")) {
+            try(PreparedStatement st = conn.prepareStatement("UPDATE guest SET name=?,address=?,phone=?,bithDate=? WHERE id=?")) {
               
-                st.setString(1,guest.getName());
-                st.setString(2,guest.getAdress());
-                st.setLong(3,guest.getPhone());               
-                st.setString(4, guest.getBirthDate());
+                st.setString(1, guest.getName());
+                st.setString(2, guest.getAddress());
+                st.setLong(3, guest.getPhone());               
+                st.setString(4, HotelUtils.convertDateToString(guest.getBirthDate()));
                 
                 if(st.executeUpdate()!=1) {
                     throw new IllegalArgumentException("Failed to execute query - updateGuest - "+guest);
@@ -128,7 +129,7 @@ public class GuestManagerImpl implements GuestManager {
 
 	public Guest getGuestById(long id) throws DatabaseException {
 		   try (Connection conn = dataSource.getConnection()) {
-	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,adress,phone,birthDate FROM guest WHERE id = ?")) {
+	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,address,phone,birthDate FROM guest WHERE id = ?")) {
 	                st.setLong(1, id);
 	                ResultSet rs = st.executeQuery();
 	                if (rs.next()) {
@@ -152,16 +153,16 @@ public class GuestManagerImpl implements GuestManager {
 		  Guest guest = new Guest();
 		  guest.setId(rs.getLong("id"));
 		  guest.setName(rs.getString("name"));
-		  guest.setAdress(rs.getString("adress"));
+		  guest.setAddress(rs.getString("address"));
 		  guest.setPhone(rs.getLong("phone"));
-		  guest.setBirthDate("birthDate");
+		  guest.setBirthDate(HotelUtils.convertStringToDate(rs.getString("birthDate")));
 		  return guest;
 	    }
 	  
 	public List<Guest> findAllGuests() {
 		   log.debug("finding all guests");
 	        try (Connection conn = dataSource.getConnection()) {
-	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,adress,phone,birthDate FROM guest")) {
+	            try (PreparedStatement st = conn.prepareStatement("SELECT id,name,address,phone,birthDate FROM guest")) {
 	                ResultSet rs = st.executeQuery();
 	                List<Guest> result = new ArrayList<>();
 	                while (rs.next()) {
@@ -173,16 +174,5 @@ public class GuestManagerImpl implements GuestManager {
 	            log.error("db connection problem", ex);
 	            throw new DatabaseException("Error when retrieving all guests", ex);
 	        }
-	}
-	
-	  public static java.sql.Date convertFromJAVADateToSQLDate(
-	            java.util.Date javaDate) {
-	        java.sql.Date sqlDate = null;
-	        if (javaDate != null) {
-	            sqlDate = new Date(javaDate.getTime());
-	        }
-	        return sqlDate;
-	    }
-	
-
+	}	
 }
