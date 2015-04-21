@@ -45,11 +45,11 @@ public class SpringConfig {
         return new RoomManagerImpl(new TransactionAwareDataSourceProxy(dataSource()));
     }
 
-    @Bean
-    public RegistrationManager leaseManager() {
-    	RegistrationManager leaseManager = new RegistrationManager(dataSource());
-        leaseManager.setRoomManager(bookManager());
-        leaseManager.setGuestManager(customerManager());
-        return leaseManager;
-    }
+   /* @Bean
+    public RegistrationManager registrationManager() {
+    	RegistrationManager registrationManager = new RegistrationManager(dataSource());
+    	registrationManager.setRoomManager(bookManager());
+    	registrationManager.setGuestManager(customerManager());
+        return registrationManager;
+    }*/
 }
