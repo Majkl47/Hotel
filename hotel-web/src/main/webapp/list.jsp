@@ -18,7 +18,7 @@
             <td><c:out value="${guest.address}"/></td>
             <td><c:out value="${guest.phone}"/></td>
             <td><c:out value="${guest.birthDate}"/></td>
-            <td><form method="post" action="${pageContext.request.contextPath}/books/delete?id=${guest.id}"
+            <td><form method="post" action="${pageContext.request.contextPath}/guest/delete?id=${guest.id}"
                       style="margin-bottom: 0;"><input type="submit" value="Delete"></form></td>
         </tr>
     </c:forEach>
