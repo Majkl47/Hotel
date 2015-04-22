@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168;
+package cz.muni.fi.pv168.hotel;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

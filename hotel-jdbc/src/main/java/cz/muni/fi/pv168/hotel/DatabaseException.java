@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168;
+package cz.muni.fi.pv168.hotel;
 
 @SuppressWarnings("serial")
 public class DatabaseException extends RuntimeException{

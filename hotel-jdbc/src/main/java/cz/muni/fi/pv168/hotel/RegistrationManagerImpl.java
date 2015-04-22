@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168;
+package cz.muni.fi.pv168.hotel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,16 +12,39 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import cz.muni.fi.pv168.hotel.RegistrationManager;;
+
 
 public class RegistrationManagerImpl implements RegistrationManager {
 	
-	final static Logger log = LoggerFactory.getLogger(RegistrationManagerImpl.class);
+	//final static Logger log = LoggerFactory.getLogger(RegistrationManagerImpl.class);
 	
+    final static Logger log = LoggerFactory.getLogger(RegistrationManagerImpl.class);
+
     private final DataSource dataSource;
 
+    private JdbcTemplate jdbc;
+    private RoomManager roomManager;
+    private GuestManager guestManager;
+    
+    /*public RegistrationManagerImpl(DataSource dataSource) {
+        jdbc = new JdbcTemplate(dataSource);
+    }*/
+    
     public RegistrationManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+    
+    public void setRoomManager(RoomManager roomManager) {
+        this.roomManager = roomManager;
+    }
+
+    public void setGuestManager(GuestManager roomManager) {
+        this.guestManager = guestManager;
+    }
+
     
 	public void createRegistration(Registration registration) {
 		if (registration == null) {

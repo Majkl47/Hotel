@@ -1,38 +1,45 @@
-package cz.muni.fi.pv168.web;
+package cz.muni.fi.pv168.hotel_web;
 
-import cz.muni.fi.pv168.Guest;
-import cz.muni.fi.pv168.DatabaseException;
-import cz.muni.fi.pv168.GuestManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cz.muni.fi.pv168.hotel.DatabaseException;
+import cz.muni.fi.pv168.hotel.Guest;
+import cz.muni.fi.pv168.hotel.GuestManager;
 
+import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Servlet for managing books.
+ * Servlet implementation class GuestServlet
  */
 @WebServlet(GuestServlet.URL_MAPPING + "/*")
 public class GuestServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	 private static final String LIST_JSP = "/list.jsp";
+	 public static final String URL_MAPPING = "/guest";
 
-    private static final String LIST_JSP = "/list.jsp";
-    public static final String URL_MAPPING = "/guest";
+	 private final static Logger log = LoggerFactory.getLogger(GuestServlet.class);
 
-    private final static Logger log = LoggerFactory.getLogger(GuestServlet.class);
+	   
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	showGuestList(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //aby fungovala čestina z formuláře
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//aby fungovala čestina z formuláře
         request.setCharacterEncoding("utf-8");
         //akce podle přípony v URL
         String action = request.getPathInfo();
@@ -51,7 +58,9 @@ public class GuestServlet extends HttpServlet {
                 }
                 //zpracování dat - vytvoření záznamu v databázi
                 try {
-                    Guest guest = new Guest(null, name, address, null, null);
+                   //!!!!!
+                	Guest guest = new Guest();
+                	//!!!!
                     getGuestManager().createGuest(guest);
                     log.debug("created {}",guest);
                     //redirect-after-POST je ochrana před vícenásobným odesláním formuláře
@@ -68,11 +77,11 @@ public class GuestServlet extends HttpServlet {
                     Guest g1;
                     g1=getGuestManager().getGuestById(id);
                     getGuestManager().deleteGuest(g1);
-                    log.debug("deleted book {}",id);
+                    log.debug("deleted guest {}",id);
                     response.sendRedirect(request.getContextPath()+URL_MAPPING);
                     return;
                 } catch (DatabaseException e) {
-                    log.error("Cannot delete book", e);
+                    log.error("Cannot delete guest", e);
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                     return;
                 }
@@ -84,25 +93,27 @@ public class GuestServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown action " + action);
         }
     }
+	
+	
 
     /**
-     * Gets BookManager from ServletContext, where it was stored by {@link StartListener}.
+     * Gets GuestManager from ServletContext, where it was stored by {@link StartListener}.
      *
-     * @return BookManager instance
+     * @return GuestManager instance
      */
     private GuestManager getGuestManager() {
         return (GuestManager) getServletContext().getAttribute("guestManager");
     }
 
     /**
-     * Stores the list of books to request attribute "books" and forwards to the JSP to display it.
+     * Stores the list of guests to request attribute "guest" and forwards to the JSP to display it.
      */
     private void showGuestList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             request.setAttribute("guest", getGuestManager().findAllGuests());
             request.getRequestDispatcher(LIST_JSP).forward(request, response);
         } catch (DatabaseException e) {
-            log.error("Cannot show books", e);
+            log.error("Cannot show guest", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

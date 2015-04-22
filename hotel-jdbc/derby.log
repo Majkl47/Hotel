@@ -1,0 +1,39 @@
+----------------------------------------------------------------
+Wed Apr 22 16:37:51 CEST 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-014c-e190-473e-0000020593a8 
+on database directory memory:C:\New Java\Hotel-master\hotel-jdbc\GuestManagerTest with class loader sun.misc.Launcher$AppClassLoader@42a57993 
+Loaded from file:/C:/Users/vesna/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_40-b26
+user.dir=C:\New Java\Hotel-master\hotel-jdbc
+os.name=Windows 8
+os.arch=amd64
+os.version=6.2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Wed Apr 22 16:37:52 CEST 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance f55fc0a6-014c-e190-473e-0000020593a8 
+on database directory memory:C:\New Java\Hotel-master\hotel-jdbc\RegistrationManagerTest with class loader sun.misc.Launcher$AppClassLoader@42a57993 
+Loaded from file:/C:/Users/vesna/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_40-b26
+user.dir=C:\New Java\Hotel-master\hotel-jdbc
+os.name=Windows 8
+os.arch=amd64
+os.version=6.2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Wed Apr 22 16:37:53 CEST 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance 5938c13e-014c-e190-473e-0000020593a8 
+on database directory memory:C:\New Java\Hotel-master\hotel-jdbc\RoomManagerTest with class loader sun.misc.Launcher$AppClassLoader@42a57993 
+Loaded from file:/C:/Users/vesna/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_40-b26
+user.dir=C:\New Java\Hotel-master\hotel-jdbc
+os.name=Windows 8
+os.arch=amd64
+os.version=6.2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168.hotel_jdbc;
+package cz.muni.fi.pv168.hotel;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +15,7 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 /**
 * Spring Java configuration class. See http://static.springsource.org/spring/docs/current/spring-framework-reference/html/beans.html#beans-java
 *
-* @author Martin Kuba makub@ics.muni.cz
-*/
+* */
 @Configuration  //je to konfigurace pro Spring
 @EnableTransactionManagement //bude řídit transakce u metod označených @Transactional
 public class SpringConfig {
@@ -25,8 +24,8 @@ public class SpringConfig {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(DERBY)
-                .addScript("classpath:schema-javadb.sql")
-                .addScript("classpath:test-data.sql")
+                .addScript("classpath:createDatabase.sql")
+                .addScript("classpath:deleteDatabase.sql")
                 .build();
     }
 
@@ -36,20 +35,20 @@ public class SpringConfig {
     }
 
     @Bean //náš manager, bude obalen řízením transakcí
-    public GuestManager customerManager() {
-        return new GuestManagerImpl(dataSource());
+    public RoomManager roomManager() {
+        return new RoomManagerImpl(dataSource());
     }
 
     @Bean
-    public RoomManager bookManager() {
-        return new RoomManagerImpl(new TransactionAwareDataSourceProxy(dataSource()));
+    public GuestManager guestManager() {
+        return new GuestManagerImpl(new TransactionAwareDataSourceProxy(dataSource()));
     }
 
-   /* @Bean
+    @Bean
     public RegistrationManager registrationManager() {
-    	RegistrationManager registrationManager = new RegistrationManager(dataSource());
-    	registrationManager.setRoomManager(bookManager());
-    	registrationManager.setGuestManager(customerManager());
+    	RegistrationManagerImpl registrationManager = new RegistrationManagerImpl(dataSource());
+    	registrationManager.setGuestManager(guestManager());
+    	registrationManager.setRoomManager(roomManager());
         return registrationManager;
-    }*/
+    }
 }

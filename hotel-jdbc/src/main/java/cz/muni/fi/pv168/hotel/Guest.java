@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168;
+package cz.muni.fi.pv168.hotel;
 
 import java.util.Date;
 
@@ -10,16 +10,16 @@ public class Guest {
 	private long phone;
 	private Date birthDate;
 	
-	public Guest(){}	
+	public Guest (){}
+	
+	public Guest(Long id, String name, String address, long phone, Date birthDate) {
+		this.id=id;
+		this.name = name;
+		this.address = address;
+		this.phone = phone;
+		this.birthDate = birthDate;
+	}
 
-	public Guest(Long id, String name, String address, Long phone, Date birthDate) {
-	   this.id = id;
-	   this.name = name;
-	   this.address = address;
-	   this.phone=phone;
-	   this.birthDate=birthDate;
-	    }
-	  
 	public long getId() {
 		return id;
 	}

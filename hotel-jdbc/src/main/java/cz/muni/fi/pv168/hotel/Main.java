@@ -1,4 +1,4 @@
-package cz.muni.fi.pv168.hotel_jdbc;
+package cz.muni.fi.pv168.hotel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ public class Main {
 
         log.info("zaciname");
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
-        RoomManager roomManager = ctx.getBean("roomManager", RoomManager.class);
+        GuestManager guestManager = ctx.getBean("guestManager", GuestManager.class);
 
-        List<Room> allRooms = roomManager.findAllRooms();
-        System.out.println("allRooms = " + allRooms);
+        List<Guest> allGuest = guestManager.findAllGuests();
+        System.out.println("allGuests = " + allGuest);
 
     }
 
