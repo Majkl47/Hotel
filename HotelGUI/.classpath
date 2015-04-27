@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/org.eclipse.ui.workbench_3.8.2.v20121128-133708.jar" sourcepath="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/org.eclipse.ui.workbench_3.8.2.v20121128-133708.jar"/>
 	<classpathentry kind="lib" path="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/com.ibm.icu_4.4.2.v20110823.jar" sourcepath="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/com.ibm.icu_4.4.2.v20110823.jar"/>
 	<classpathentry kind="lib" path="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/org.eclipse.ui.forms_3.5.200.v20120521-2332.jar" sourcepath="C:/Users/vesna/Downloads/springsource/sts-3.4.0.RELEASE/plugins/org.eclipse.ui.forms_3.5.200.v20120521-2332.jar"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

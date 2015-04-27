@@ -18,6 +18,8 @@ public class Hotel_GUI {
 	private JTable table_ShowAll;
 	NewRegistration nr;
 	Search s;
+	GuestForm guestInfo;
+	RoomForm roomF;
 	
 
 	/**
@@ -79,22 +81,41 @@ public class Hotel_GUI {
 				s.setVisible(true);
 			}
 		});
-		btnSeach.setBounds(217, 72, 137, 51);
+		btnSeach.setBounds(466, 159, 137, 51);
 		panel.add(btnSeach);
 		
 		JButton btnDelete = new JButton("Delete");
-		btnDelete.setBounds(418, 72, 137, 51);
+		btnDelete.setBounds(615, 159, 137, 51);
 		panel.add(btnDelete);
 		
 		JButton btnShowAll = new JButton("Show All");
-		btnShowAll.setBounds(615, 72, 137, 51);
+		btnShowAll.setBounds(317, 159, 137, 51);
 		panel.add(btnShowAll);
 		
 		table_ShowAll = new JTable();
 		table_ShowAll.setBounds(23, 223, 729, 242);
 		panel.add(table_ShowAll);
 		
+		JButton btnGuestInfo = new JButton("Guest Information");
+		btnGuestInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				guestInfo=new GuestForm();
+				guestInfo.setVisible(true);
+			}
+		});
+		btnGuestInfo.setBounds(172, 72, 137, 51);
+		panel.add(btnGuestInfo);
+		
+		JButton btnRoomInfo = new JButton("Room Information");
+		btnRoomInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				roomF=new RoomForm();
+				roomF.setVisible(true);
+			}
+		});
+		btnRoomInfo.setBounds(317, 72, 137, 51);
+		panel.add(btnRoomInfo);
+		
 		
 	}
-
 }
