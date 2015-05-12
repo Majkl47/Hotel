@@ -84,6 +84,75 @@ public class RoomManagerImpl implements RoomManager {
             throw new DatabaseException("database select failed", e);
         }
     }
+    
+    @Override
+    public List<Room> getRoomsByFloor(int sFloor) throws DatabaseException {
+        try (Connection con = dataSource.getConnection()) {
+            try (PreparedStatement st = con.prepareStatement("SELECT id,floor,number,capacity FROM rooms where floor = ?")) {
+                st.setInt(1, sFloor);
+                ResultSet rs = st.executeQuery();
+                List<Room> rooms = new ArrayList<>();
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    int floor = rs.getInt("floor");
+                    int number = rs.getInt("number");
+                    int capacity = rs.getInt("capacity");
+                    rooms.add(new Room(id, floor, number, capacity));
+                }
+                log.info("All rooms retrieved");
+                return rooms;
+            }
+        } catch (SQLException e) {
+            log.error("cannot select rooms", e);
+            throw new DatabaseException("database select failed", e);
+        }
+    }
+    
+    @Override
+    public List<Room> getRoomByNumber(int sNumber) throws DatabaseException {
+        try (Connection con = dataSource.getConnection()) {
+            try (PreparedStatement st = con.prepareStatement("SELECT id,floor,number,capacity FROM rooms where number = ?")) {
+                st.setInt(1, sNumber);
+                ResultSet rs = st.executeQuery();
+                List<Room> rooms = new ArrayList<>();
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    int floor = rs.getInt("floor");
+                    int number = rs.getInt("number");
+                    int capacity = rs.getInt("capacity");
+                    rooms.add(new Room(id, floor, number, capacity));
+                }
+                log.info("All rooms retrieved");
+                return rooms;
+            }
+        } catch (SQLException e) {
+            log.error("cannot select rooms", e);
+            throw new DatabaseException("database select failed", e);
+        }
+    }
+    
+    @Override
+    public List<Room> getRoomsByCapacity(int sCapacity) throws DatabaseException {
+        try (Connection con = dataSource.getConnection()) {
+            try (PreparedStatement st = con.prepareStatement("SELECT id,floor,number,capacity FROM rooms where capacity = ?")) {
+                st.setInt(1, sCapacity);
+                ResultSet rs = st.executeQuery();
+                List<Room> rooms = new ArrayList<>();
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    int floor = rs.getInt("floor");
+                    int number = rs.getInt("number");
+                    int capacity = rs.getInt("capacity");
+                    rooms.add(new Room(id, floor, number, capacity));
+                }
+                log.info("All rooms retrieved");
+                return rooms;
+            }
+        } catch (SQLException e) {
+            log.error("cannot select rooms", e);
+            throw new DatabaseException("database select failed", e);
+        }
+    }
 
     @Override
     public void updateRoom(Room room) throws DatabaseException {

@@ -16,7 +16,7 @@ public class Main {
         log.info("Main start");
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         RoomManager roomManager = ctx.getBean("roomManager", RoomManager.class);
-
+        
         List<Room> allRooms = roomManager.getAllRooms();
         System.out.println("allBooks = " + allRooms);
     }

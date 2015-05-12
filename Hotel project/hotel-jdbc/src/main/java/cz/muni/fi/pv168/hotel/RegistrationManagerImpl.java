@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,5 +153,83 @@ public class RegistrationManagerImpl implements RegistrationManager {
             }
         },
         r.getId());
+    }
+    
+    @Override
+    public List<Registration> getRegistrationsByStartDate(final Date date) throws DatabaseException {
+        log.info("Registration for start date: " + date.toString() + " retrived");
+        return jdbc.query("SELECT * FROM registrations WHERE startDate=?", new RowMapper<Registration>() {
+            @Override
+            public Registration mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long guestId = rs.getLong("guestId");
+                Guest guest = null;
+                try {
+                    guest = guestManager.getGuestById(guestId);
+                } catch (DatabaseException e) {
+                    log.error("cannot find guest", e);
+                }
+                long roomId = rs.getLong("roomId");
+                Room room = null;
+                try {
+                    room = roomManager.getRoomById(roomId);
+                } catch (DatabaseException ex) {
+                    log.error("cannot find room", ex);
+                }
+                return new Registration(rs.getLong("id"), room, guest, date, HotelUtils.convertStringToDate(rs.getString("endDate")), rs.getDouble("price"));
+            }
+        },
+                HotelUtils.convertDateToString(date));
+    }
+    
+    @Override
+    public List<Registration> getRegistrationsByEndDate(final Date date) throws DatabaseException {
+        log.info("Registration for end date: " + date.toString() + " retrived");
+        return jdbc.query("SELECT * FROM registrations WHERE endDate=?", new RowMapper<Registration>() {
+            @Override
+            public Registration mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long guestId = rs.getLong("guestId");
+                Guest guest = null;
+                try {
+                    guest = guestManager.getGuestById(guestId);
+                } catch (DatabaseException e) {
+                    log.error("cannot find guest", e);
+                }
+                long roomId = rs.getLong("roomId");
+                Room room = null;
+                try {
+                    room = roomManager.getRoomById(roomId);
+                } catch (DatabaseException ex) {
+                    log.error("cannot find room", ex);
+                }
+                return new Registration(rs.getLong("id"), room, guest, HotelUtils.convertStringToDate(rs.getString("startDate")), date, rs.getDouble("price"));
+            }
+        },
+                HotelUtils.convertDateToString(date));
+    }
+    
+    @Override
+    public List<Registration> getRegistrationsByPrice(final double price) throws DatabaseException {
+        log.info("Registration for price: " + price + " retrived");
+        return jdbc.query("SELECT * FROM registrations WHERE price=?", new RowMapper<Registration>() {
+            @Override
+            public Registration mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long guestId = rs.getLong("guestId");
+                Guest guest = null;
+                try {
+                    guest = guestManager.getGuestById(guestId);
+                } catch (DatabaseException e) {
+                    log.error("cannot find guest", e);
+                }
+                long roomId = rs.getLong("roomId");
+                Room room = null;
+                try {
+                    room = roomManager.getRoomById(roomId);
+                } catch (DatabaseException ex) {
+                    log.error("cannot find room", ex);
+                }
+                return new Registration(rs.getLong("id"), room, guest, HotelUtils.convertStringToDate(rs.getString("startDate")), HotelUtils.convertStringToDate(rs.getString("endDate")), price);
+            }
+        },
+                price);
     }
 }

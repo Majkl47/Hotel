@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,5 +77,30 @@ public class GuestManagerImpl implements GuestManager {
         Number id = insertGuest.executeAndReturnKey(parameters);
         g.setId(id.longValue());
         log.info("New guest created");
+    }
+    
+    
+    @Override
+    public List<Guest> getGuestsByName(String name) throws DatabaseException {
+        log.info("Guests by name retrieved");
+        return jdbc.query("SELECT * FROM guests where name=?", guestMapper, name);
+    }
+    
+    @Override
+    public List<Guest> getGuestsByAddress(String address) throws DatabaseException {
+        log.info("Guests by address retrieved");
+        return jdbc.query("SELECT * FROM guests where address=?", guestMapper, address);
+    }
+    
+    @Override
+    public List<Guest> getGuestsByPhone(long phone) throws DatabaseException {
+        log.info("Guests by phone retrieved");
+        return jdbc.query("SELECT * FROM guests where phone=?", guestMapper, phone);
+    }
+    
+    @Override
+    public List<Guest> getGuestsByBirthDate(Date date) throws DatabaseException {
+        log.info("Guests by BirthDate retrieved");
+        return jdbc.query("SELECT * FROM guests where birthdate=?", guestMapper, HotelUtils.convertDateToString(date));
     }
 }
