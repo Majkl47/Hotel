@@ -87,8 +87,8 @@ public class RegistrationManagerImpl implements RegistrationManager {
     
     @Override
     public void updateRegistration(Registration r) {
-        jdbc.update("UPDATE regustrations set roomId=?,guestId=?,startDate=?,endDate=?,price=? where id=?",
-                r.getRoom(), r.getGuest(), HotelUtils.convertDateToString(r.getStartDate()), HotelUtils.convertDateToString(r.getEndDate()), r.getPrice());
+        jdbc.update("UPDATE registrations set roomId=?,guestId=?,startDate=?,endDate=?,price=? where id=?",
+                r.getRoom().getId(), r.getGuest().getId(), HotelUtils.convertDateToString(r.getStartDate()), HotelUtils.convertDateToString(r.getEndDate()), r.getPrice(), r.getId());
         log.info("Registration with id: " + r.getId() + " updated");
     }
 

@@ -38,8 +38,7 @@ public class HotelAddRegistration extends javax.swing.JFrame {
      */
     public HotelAddRegistration() {
         initComponents();
-        MySwingWorker2 worker2 = new MySwingWorker2();
-        worker2.execute();
+
         guestModel = new DefaultTableModel(new Object[][]{
             {null, null, null, null},
             {null, null, null, null},
@@ -52,8 +51,6 @@ public class HotelAddRegistration extends javax.swing.JFrame {
 
         guestTable.setModel(guestModel);
 
-        MySwingWorker worker = new MySwingWorker();
-        worker.execute();
         roomModel = new DefaultTableModel(new Object[][]{
             {null, null, null},
             {null, null, null},
@@ -77,6 +74,12 @@ public class HotelAddRegistration extends javax.swing.JFrame {
         @Override
         protected void done() {
             publish("Rooms retrieved");
+            while (roomTable.getModel().getRowCount() < roomList.size()) {
+                roomModel.addRow(new Object[]{null, null, null});
+            }
+
+            showActualRoom();
+            roomPreviousRowCount = roomTable.getRowCount();
         }
 
         @Override
@@ -96,6 +99,12 @@ public class HotelAddRegistration extends javax.swing.JFrame {
         @Override
         protected void done() {
             publish("Guests retrieved");
+            while (guestTable.getModel().getRowCount() < guestList.size()) {
+                guestModel.addRow(new Object[]{null, null, null});
+            }
+
+            showActualGuest();
+            guestPreviousRowCount = guestTable.getRowCount();
         }
 
         @Override
@@ -456,12 +465,6 @@ public class HotelAddRegistration extends javax.swing.JFrame {
         clearTableGuest();
         MySwingWorker2 worker2 = new MySwingWorker2();
         worker2.execute();
-        while (guestTable.getModel().getRowCount() < guestList.size()) {
-            guestModel.addRow(new Object[]{null, null, null});
-        }
-
-        showActualGuest();
-        guestPreviousRowCount = guestTable.getRowCount();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -469,12 +472,6 @@ public class HotelAddRegistration extends javax.swing.JFrame {
         clearTableRoom();
         MySwingWorker worker = new MySwingWorker();
         worker.execute();
-        while (roomTable.getModel().getRowCount() < roomList.size()) {
-            roomModel.addRow(new Object[]{null, null, null});
-        }
-
-        showActualRoom();
-        roomPreviousRowCount = roomTable.getRowCount();
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void roomTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roomTextFieldActionPerformed

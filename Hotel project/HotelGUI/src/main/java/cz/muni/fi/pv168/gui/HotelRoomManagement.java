@@ -9,7 +9,6 @@ import cz.muni.fi.pv168.hotel.DatabaseException;
 import cz.muni.fi.pv168.hotel.Room;
 import cz.muni.fi.pv168.hotel.RoomManager;
 import java.util.List;
-import javafx.concurrent.WorkerStateEvent;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
@@ -19,7 +18,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class HotelRoomManagement extends javax.swing.JFrame {
 
-    private HotelAddRoom addRoom;
 
     private List<Room> roomList;
     private RoomManager roomManager = HotelMain.getRoomManager();
@@ -31,8 +29,6 @@ public class HotelRoomManagement extends javax.swing.JFrame {
      */
     public HotelRoomManagement() {
         initComponents();
-        MySwingWorker worker = new MySwingWorker();
-        worker.execute();
         model = new DefaultTableModel(new Object[][]{
             {null, null, null},
             {null, null, null},
@@ -56,6 +52,12 @@ public class HotelRoomManagement extends javax.swing.JFrame {
         @Override
         protected void done() {
             publish("Rooms retrieved");
+            while (table.getModel().getRowCount() < roomList.size()) {
+                model.addRow(new Object[]{null, null, null});
+            }
+
+            showActual();
+            previousRowCount = table.getRowCount();
         }
 
         @Override
@@ -83,6 +85,7 @@ public class HotelRoomManagement extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         comboBox = new javax.swing.JComboBox();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         jButton3.setText("jButton3");
 
@@ -135,28 +138,35 @@ public class HotelRoomManagement extends javax.swing.JFrame {
             }
         });
 
+        jButton6.setText("Edit");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(109, 109, 109)
                         .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton6)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton4))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -169,7 +179,8 @@ public class HotelRoomManagement extends javax.swing.JFrame {
                     .addComponent(comboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2)
                     .addComponent(jButton1)
-                    .addComponent(jButton5))
+                    .addComponent(jButton5)
+                    .addComponent(jButton6))
                 .addGap(40, 40, 40)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31))
@@ -222,19 +233,10 @@ public class HotelRoomManagement extends javax.swing.JFrame {
         clearTable();
         MySwingWorker worker = new MySwingWorker();
         worker.execute();
-        while (table.getModel().getRowCount() < roomList.size()) {
-            model.addRow(new Object[]{null, null, null});
-        }
-
-        showActual();
-        previousRowCount = table.getRowCount();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (addRoom == null) {
-            addRoom = new HotelAddRoom();
-        }
-        addRoom.setVisible(true);
+        new HotelAddRoom().setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -269,6 +271,14 @@ public class HotelRoomManagement extends javax.swing.JFrame {
         }
         showActual();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if (table.getSelectedRowCount() == 1 && table.getSelectedRow() < roomList.size()) {
+            HotelEditRoom edit = new HotelEditRoom();
+            edit.setRoomId(roomList.get(table.getSelectedRow()).getId());
+            edit.setVisible(true);
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -313,6 +323,7 @@ public class HotelRoomManagement extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable table;
     private javax.swing.JTextField textField;
